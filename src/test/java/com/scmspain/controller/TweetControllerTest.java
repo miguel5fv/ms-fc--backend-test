@@ -3,8 +3,10 @@ package com.scmspain.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scmspain.configuration.TestConfiguration;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfiguration.class)
 public class TweetControllerTest {
@@ -36,9 +39,11 @@ public class TweetControllerTest {
     }
 
     @Test
-    public void shouldReturn200WhenInsertingAValidTweet() throws Exception {
-        mockMvc.perform(newTweet("Prospect", "Breaking the law"))
+    public void shouldReturn200WhenDiscardingAnExistingTweet() throws Exception {
+        mockMvc.perform(newTweet("Prospected", "Breaking the law"))
                 .andExpect(status().is(201));
+
+        mockMvc.perform(discardTweet(1L)).andExpect(status().is(204));
     }
 
     @Test
@@ -48,17 +53,9 @@ public class TweetControllerTest {
     }
 
     @Test
-    public void shouldReturn400WhenInsertingAnInvalidTweet() throws Exception {
-        mockMvc.perform(newTweet("Schibsted Spain", "We are Schibsted Spain (look at our home page http://www.schibsted.es/ to gather more information related with us), we own Vibbo, InfoJobs, fotocasa, coches.net and milanuncios. Welcome!"))
-                .andExpect(status().is(400));
-    }
-
-    @Test
-    public void shouldReturn200WhenDiscardingAnExistingTweet() throws Exception {
-        mockMvc.perform(newTweet("Prospected", "Breaking the law"))
+    public void shouldReturn200WhenInsertingAValidTweet() throws Exception {
+        mockMvc.perform(newTweet("Prospect", "Breaking the law"))
                 .andExpect(status().is(201));
-
-        mockMvc.perform(discardTweet(1L)).andExpect(status().is(204));
     }
 
     @Test
@@ -67,12 +64,9 @@ public class TweetControllerTest {
     }
 
     @Test
-    public void shouldReturnAllPublishedTweets() throws Exception {
-        mockMvc.perform(newTweet("Yo", "How are you?"))
-                .andExpect(status().is(201));
-
-        this.assertTweetListResults("/tweet", 1);
-        this.assertTweetListResults("/discarded", 0);
+    public void shouldReturn400WhenInsertingAnInvalidTweet() throws Exception {
+        mockMvc.perform(newTweet("Schibsted Spain", "We are Schibsted Spain (look at our home page http://www.schibsted.es/ to gather more information related with us), we own Vibbo, InfoJobs, fotocasa, coches.net and milanuncios. Welcome!"))
+                .andExpect(status().is(400));
     }
 
     @Test
@@ -80,10 +74,19 @@ public class TweetControllerTest {
         mockMvc.perform(newTweet("YoYo", "What's up?"))
                 .andExpect(status().is(201));
 
-        mockMvc.perform(discardTweet(1L)).andExpect(status().is(204));
+        mockMvc.perform(discardTweet(2L)).andExpect(status().is(204));
+
+        this.assertTweetListResults("/tweet", 2);
+        this.assertTweetListResults("/discarded", 2);
+    }
+
+    @Test
+    public void shouldReturnAllPublishedTweets() throws Exception {
+        mockMvc.perform(newTweet("Yo", "How are you?"))
+                .andExpect(status().is(201));
 
         this.assertTweetListResults("/tweet", 3);
-        this.assertTweetListResults("/discarded", 1);
+        this.assertTweetListResults("/discarded", 2);
     }
 
     private MockHttpServletRequestBuilder newTweet(String publisher, String tweet) {
@@ -104,6 +107,7 @@ public class TweetControllerTest {
                 .andReturn();
 
         String content = getResult.getResponse().getContentAsString();
+        System.out.println(content);
         assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(numberResults);
     }
 }
