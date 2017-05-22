@@ -38,13 +38,32 @@ public class TweetControllerTest {
     @Test
     public void shouldReturn200WhenInsertingAValidTweet() throws Exception {
         mockMvc.perform(newTweet("Prospect", "Breaking the law"))
-            .andExpect(status().is(201));
+                .andExpect(status().is(201));
+    }
+
+    @Test
+    public void shouldReturn200WhenInsertingATweetWithUrl() throws Exception {
+        mockMvc.perform(newTweet("Schibsted Spain", "We are Schibsted Spain (look at our home page http://www.schibsted.es/), we own Vibbo, InfoJobs, fotocasa, coches.net and milanuncios. Welcome!"))
+                .andExpect(status().is(201));
     }
 
     @Test
     public void shouldReturn400WhenInsertingAnInvalidTweet() throws Exception {
-        mockMvc.perform(newTweet("Schibsted Spain", "We are Schibsted Spain (look at our home page http://www.schibsted.es/), we own Vibbo, InfoJobs, fotocasa, coches.net and milanuncios. Welcome!"))
+        mockMvc.perform(newTweet("Schibsted Spain", "We are Schibsted Spain (look at our home page http://www.schibsted.es/ to gather more information related with us), we own Vibbo, InfoJobs, fotocasa, coches.net and milanuncios. Welcome!"))
                 .andExpect(status().is(400));
+    }
+
+    @Test
+    public void shouldReturn200WhenDiscardingAnExistingTweet() throws Exception {
+        mockMvc.perform(newTweet("Prospected", "Breaking the law"))
+                .andExpect(status().is(201));
+
+        mockMvc.perform(discardTweet(1L)).andExpect(status().is(204));
+    }
+
+    @Test
+    public void shouldReturn400WhenDiscardingUnexistingTweet() throws Exception {
+        mockMvc.perform(discardTweet(0L)).andExpect(status().is(400));
     }
 
     @Test
@@ -52,12 +71,19 @@ public class TweetControllerTest {
         mockMvc.perform(newTweet("Yo", "How are you?"))
                 .andExpect(status().is(201));
 
-        MvcResult getResult = mockMvc.perform(get("/tweet"))
-                .andExpect(status().is(200))
-                .andReturn();
+        this.assertTweetListResults("/tweet", 1);
+        this.assertTweetListResults("/discarded", 0);
+    }
 
-        String content = getResult.getResponse().getContentAsString();
-        assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(1);
+    @Test
+    public void shouldReturnAllDiscardedTweets() throws Exception {
+        mockMvc.perform(newTweet("YoYo", "What's up?"))
+                .andExpect(status().is(201));
+
+        mockMvc.perform(discardTweet(1L)).andExpect(status().is(204));
+
+        this.assertTweetListResults("/tweet", 3);
+        this.assertTweetListResults("/discarded", 1);
     }
 
     private MockHttpServletRequestBuilder newTweet(String publisher, String tweet) {
@@ -66,4 +92,18 @@ public class TweetControllerTest {
                 .content(format("{\"publisher\": \"%s\", \"tweet\": \"%s\"}", publisher, tweet));
     }
 
+    private MockHttpServletRequestBuilder discardTweet(Long idTweet) {
+        return post("/discarded")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(format("{\"tweet\": \"%s\"}", idTweet));
+    }
+
+    private void assertTweetListResults(String endPoint, Integer numberResults) throws Exception  {
+        MvcResult getResult = mockMvc.perform(get(endPoint))
+                .andExpect(status().is(200))
+                .andReturn();
+
+        String content = getResult.getResponse().getContentAsString();
+        assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(numberResults);
+    }
 }
