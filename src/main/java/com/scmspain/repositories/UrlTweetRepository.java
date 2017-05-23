@@ -30,13 +30,12 @@ public class UrlTweetRepository {
 
     /**
       Push tweet to repository
-      Parameter - publisher - creator of the Tweet
-      Parameter - text - Content of the Tweet
-      Result - recovered Tweet
+      Parameter - urlTweet - UrlTweet to be persisted
+      Result - Persist UrlTweet
     */
-    public void addUrlTweet(UrlTweet tweet) {
+    public void addUrlTweet(UrlTweet urlTweet) {
         this.incrementMetrics("add-urlTweet");
-        this.entityManager.persist(tweet);
+        this.entityManager.persist(urlTweet);
     }
 
     /**

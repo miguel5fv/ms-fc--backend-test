@@ -39,9 +39,10 @@ public class UrlTweetService {
      Store urls in repository
      Parameter - idTweet - identifier of the tweet to store the urls
      Parameter - tweet - Content with urls to extract and store
+     Result - UrlTweet from text stored
      */
-    public void storeUrlsFromTweet(Long idTweet, String tweet) {
-        this.persistUrlsFromTweet(idTweet, tweet, this.getUrlsFromTweetContent(tweet));
+    public void storeUrlsFromTweet(Long idTweet, String tweetContent) {
+        this.persistUrlsFromTweet(idTweet, tweetContent, this.getUrlsFromTweetContent(tweetContent));
     }
 
     private List<String> getUrlsFromTweetContent(String tweet) {
@@ -77,7 +78,7 @@ public class UrlTweetService {
     /**
      Given a tweet returns a tweetDto with the content decorated with the urls
      Parameter - tweet - tweet entity
-     Result - tweet dto with the content text decorated with its urls
+     Result - TweetDto with the content text decorated with its urls
      */
     public TweetDto decorateTweetWithUrls(Tweet tweet) {
         List<UrlTweet> listOfUrlTweets = this.urlTweetRepository.listAllUrlTweets(tweet.getId());

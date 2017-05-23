@@ -1,5 +1,7 @@
 package com.scmspain.entities;
 
+import com.scmspain.enums.TweetStatusEnum;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ public class Tweet {
     @Column (nullable=true)
     private Long pre2015MigrationStatus = 0L;
     @Column (nullable=false)
-    private Integer status = 0;
+    private Integer status = TweetStatusEnum.PUBLISHED.getValue();
     @Column (nullable=false)
     private Long updatedAt;
 

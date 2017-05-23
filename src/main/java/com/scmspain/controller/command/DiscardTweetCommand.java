@@ -7,13 +7,13 @@ package com.scmspain.controller.command;
  * @author  Miguel Florido (miguel5fv@gmail.com)
  */
 public class DiscardTweetCommand {
-    private Long tweet;
+    private Long idTweet;
 
     public Long getTweet() {
-        return tweet;
+        return idTweet;
     }
 
-    public void setTweet(Long tweet) {
-        this.tweet = tweet;
+    public void setTweet(Long idTweet) {
+        this.idTweet = idTweet;
     }
 }

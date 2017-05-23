@@ -33,6 +33,7 @@ public class TweetRepository {
       Push tweet to repository
       Parameter - publisher - creator of the Tweet
       Parameter - text - Content of the Tweet
+      Result - Persist tweet published
     */
     public void addTweet(Tweet tweet) {
         this.incrementMetrics("published-tweets");
@@ -44,6 +45,7 @@ public class TweetRepository {
     /**
      Discard a tweet from repository
      Parameter - Tweet - Tweet to be discarded
+     Result - Persist tweet discarded
      */
     public void discardTweet(Tweet tweet) {
         this.incrementMetrics("discarded-tweets");
@@ -63,7 +65,7 @@ public class TweetRepository {
 
     /**
       Recover tweet from repository
-      Result - retrieved Tweet
+      Result - retrieved list of published Tweet
     */
     public List<Tweet> listAllTweets() {
         this.incrementMetrics("times-queried-tweets");
@@ -72,7 +74,7 @@ public class TweetRepository {
 
     /**
       Recover discarded tweets
-      Result - retrieved discarded Tweet
+      Result - retrieved list of discarded Tweet
     */
     public List<Tweet> listAllDiscardedTweets() {
         this.incrementMetrics("times-queried-discarded-tweets");

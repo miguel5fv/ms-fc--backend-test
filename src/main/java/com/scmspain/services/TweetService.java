@@ -25,10 +25,10 @@ public class TweetService {
     }
 
     /**
-     Push tweet to repository
+     Publish a tweet
      Parameter - publisher - creator of the Tweet
      Parameter - text - Content of the Tweet
-     Result - recovered Tweet
+     Result - published Tweet
      */
     public void publishTweet(String publisher, String text) {
         String cleanedText = this.urlTweetService.getTextWithoutUrls(text);
@@ -51,15 +51,15 @@ public class TweetService {
     }
 
     private void checkContentTweet(String text) {
-        if (text == null || text.length() < 1 || text.length() > Tweet.TWEET_LENGTH) {
+        if (text == null || text.length() < 1 || text.length() >= Tweet.TWEET_LENGTH) {
             throw new IllegalArgumentException("Tweet must not be greater than " + Tweet.TWEET_LENGTH + " characters");
         }
     }
 
     /**
-     Recover tweet from repository
+     Recover tweet
      Parameter - id - id of the Tweet to retrieve
-     Result - retrieved Tweet
+     Result - retrieved TweetDto
      */
     public TweetDto getTweet(Long id) {
         checkIdTweet(id);
@@ -80,9 +80,8 @@ public class TweetService {
     }
 
     /**
-     Recover tweet from repository
-     Parameter - id - id of the Tweet to retrieve
-     Result - retrieved Tweet
+     List all of the published tweets
+     Result - List of TweetDto published
      */
     public List<TweetDto> listAllTweets() {
         List<Tweet> tweets = this.tweetRepository.listAllTweets();
@@ -91,9 +90,9 @@ public class TweetService {
     }
 
     /**
-     Push tweet to repository
+     Discard a tweet
      Parameter - id - identifier of the Tweet
-     Result - recovered Tweet
+     Result - Tweet discarded
      */
     public void discardTweet(Long idTweet) {
         checkIdTweet(idTweet);
@@ -114,9 +113,8 @@ public class TweetService {
     }
 
     /**
-     Recover tweet from repository
-     Parameter - id - id of the Tweet to retrieve
-     Result - retrieved Tweet
+     List all of the discarded tweets
+     Result - List of TweetDto discarded
      */
     public List<TweetDto> listAllDiscardedTweets() {
         List<Tweet> tweets = this.tweetRepository.listAllDiscardedTweets();
